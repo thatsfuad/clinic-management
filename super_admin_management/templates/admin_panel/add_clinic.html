@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Clinic</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .form-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-container h2 {
+            color: #007bff;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            padding: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+        }
+
+        .form-control:hover {
+            border-color: #007bff;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group-text {
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-right: none;
+            border-radius: 5px 0 0 5px;
+        }
+
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+            font-weight: 600;
+            padding: 12px;
+            border-radius: 5px;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+
+        .alert {
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .form-check-input {
+            margin-top: 0.3em;
+        }
+
+        .form-check-label {
+            margin-left: 0.5em;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+
+        .form-control.is-invalid:focus {
+            box-shadow: 0 0 5px rgba(220, 53, 69, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="form-container">
+            <h2>Add New Clinic</h2>
+
+            <!-- Success Message -->
+            {% if messages %}
+                <div class="alert alert-success" role="alert">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="clinic_name" class="form-label">Clinic Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-building"></i></span>
+                            <input type="text" class="form-control" id="clinic_name" name="clinic_name" placeholder="Enter clinic name" required>
+                        </div>
+                        <div class="error-message" id="clinic_name_error"></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="specialization" class="form-label">Specialization</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-heart-pulse"></i></span>
+                            <input type="text" class="form-control" id="specialization" name="specialization" placeholder="Enter specialization" required>
+                        </div>
+                        <div class="error-message" id="specialization_error"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                            <input type="text" class="form-control" id="address" name="address" placeholder="Enter address" required>
+                        </div>
+                        <div class="error-message" id="address_error"></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-pin-map"></i></span>
+                            <input type="text" class="form-control" id="city" name="city" placeholder="Enter city" required>
+                        </div>
+                        <div class="error-message" id="city_error"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="postal_code" class="form-label">Postal Code</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-mailbox"></i></span>
+                            <input type="text" class="form-control" id="postal_code" name="postal_code" placeholder="Enter postal code" required>
+                        </div>
+                        <div class="error-message" id="postal_code_error"></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="phone" class="form-label">Phone</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                            <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter phone number" required>
+                        </div>
+                        <div class="error-message" id="phone_error"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+                    </div>
+                    <div class="error-message" id="email_error"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="services" class="form-label">Services</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-list-check"></i></span>
+                        <textarea class="form-control" id="services" name="services" placeholder="Enter services offered" rows="3" required></textarea>
+                    </div>
+                    <div class="error-message" id="services_error"></div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="operating_days" class="form-label">Operating Days</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                            <input type="text" class="form-control" id="operating_days" name="operating_days" placeholder="Enter operating days" required>
+                        </div>
+                        <div class="error-message" id="operating_days_error"></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="operating_hours" class="form-label">Operating Hours</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-clock"></i></span>
+                            <input type="text" class="form-control" id="operating_hours" name="operating_hours" placeholder="Enter operating hours" required>
+                        </div>
+                        <div class="error-message" id="operating_hours_error"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="service_24_7" name="service_24_7">
+                    <label for="service_24_7" class="form-check-label">24/7 Service</label>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="chat_enabled" name="chat_enabled">
+                    <label for="chat_enabled" class="form-check-label">Chat Enabled (For Emergencies)</label>
+                </div>
+
+                <button type="submit" class="btn btn-custom w-100">Add Clinic</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

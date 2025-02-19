@@ -1,0 +1,658 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <!-- Font Awesome -->
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    rel="stylesheet"
+  />
+  <style>
+ 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    html, body {
+      height: 100vh;
+      overflow: hidden; /* Prevent overall page scrolling */
+    }
+    body {
+      display: flex;
+      background-color: #f9f9f9;
+    }
+    
+    /* ========= Sidebar ========= */
+    .sidebar {
+      width: 200px;
+      height: 100vh;
+      background-color: white;
+      border-right: 1px solid #dcdcdc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: fixed;
+      transition: width 0.3s ease;
+    }
+    .sidebar.collapsed {
+      width: 50px;
+    }
+    .sidebar.collapsed #nav-links span {
+      display: none;
+    }
+    .logo {
+      width: 100%;
+      height: 80px;
+      background-color: #dcdcdc;
+      color: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    nav {
+      width: 100%;
+      margin-top: 10px;
+    }
+    nav ul {
+      list-style: none;
+      width: 100%;
+    }
+    nav ul li a {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 12px 20px;
+      color: black;
+      text-decoration: none;
+      font-size: 16px;
+      border-bottom: 1px solid #f1f1f1;
+      transition: background 0.3s ease;
+    }
+    nav ul li a i {
+      margin-right: 10px;
+    }
+    nav ul li a:hover {
+      background: #f1f1f1;
+    }
+    #collapse-icon {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      cursor: pointer;
+      background-color: #fff;
+    }
+    #collapse-icon i {
+      font-size: 24px;
+      color: #333;
+    }
+    
+    /* ========= Main Content ========= */
+    .main-content {
+      margin-left: 200px;
+      width: calc(100% - 200px);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: margin-left 0.3s ease;
+    }
+    .sidebar.collapsed ~ .main-content {
+      margin-left: 50px;
+      width: calc(100% - 50px);
+    }
+    
+    /* --------- Header (fixed at top) --------- */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      background-color: white;
+      height: 80px;
+      border-bottom: 1px solid #ddd;
+      flex-shrink: 0;
+    }
+    header h1 {
+      font-size: 34px;
+      color: black;
+      margin-left: 10px;
+    }
+    .header-icons {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+    .header-icons a {
+      color: black;
+      font-size: 20px;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #dcdcdc;
+      background-color: white;
+      transition: background 0.3s ease;
+    }
+    .header-icons a:hover {
+      background-color: #f1f1f1;
+      border-color: #bbb;
+    }
+    
+    /* --------- Fixed Divs (Appointments & Reports) --------- */
+    .fixed-divs {
+      display: flex;
+      gap: 10px;
+      padding: 20px;
+      flex-shrink: 0;
+    }
+    /* Reduced height from 300px to 290px */
+    .fixed-div {
+      flex: 1;
+      height: 290px;
+      border-radius: 8px;
+      display: block;
+      font-size: 18px;
+      color: black;
+      border: 1px solid #e0e0e0;
+      overflow: hidden; /* Inner containers will handle scrolling */
+    }
+    
+    /* ===== Today's Appointments Section ===== */
+    /* Header remains fixed; only the appointments list scrolls */
+    #appointmentsDiv .appointment-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px 8px 0 0;
+      width: 100%;
+      max-width: 800px;
+    }
+    #appointmentsDiv .left-section {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+    }
+    #appointmentsDiv .left-section h2 {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+    #appointmentsDiv .left-section p {
+      font-size: 14px;
+      color: gray;
+    }
+    #appointmentsDiv .right-section {
+      display: flex;
+      align-items: center;
+    }
+    #appointmentsDiv .right-section button {
+      background-color: black;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    #appointmentsDiv .right-section button:hover {
+      background-color: #333;
+    }
+    #appointmentsDiv hr {
+      margin: 0;
+      border: 1px solid #ddd;
+    }
+    /* Scrollable content for appointments */
+    #appointmentsList {
+      height: calc(100% - 80px); /* Header fixed; only the list scrolls */
+      overflow-y: auto;
+      padding: 10px;
+    }
+    /* Appointment rows */
+    .appointment-time-person {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: white;
+      padding: 15px;
+      border-radius: 12px;
+      width: 96%;
+      max-width: 800px;
+      border: 1px solid #ddd;
+      margin: 10px auto 0 auto;
+    }
+    .appointment-time-person .left-section p:first-child {
+      padding: 2px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      background-color: rgb(211, 211, 211);
+      color: black;
+    }
+    .appointment-time-person .left-section p:nth-child(2) {
+      color: black;
+      font-weight: bold;
+    }
+    .appointment-time-person .right-section p {
+      color: gray;
+      font-size: 14px;
+    }
+    
+    /* ===== Newly Updated Reports Section ===== */
+    /* Header structure similar to appointments */
+    #reportsDiv .appointment-container {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px 8px 0 0;
+      width: 100%;
+      max-width: 800px;
+    }
+    #reportsDiv .appointment-container .left-section h2 {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+    #reportsDiv hr {
+      margin: 0;
+      border: 1px solid #ddd;
+    }
+    /* Scrollable content for reports */
+    #expanding-newly-reports-div {
+      height: calc(100% - 80px);
+      overflow-y: auto;
+      padding: 10px;
+    }
+    /* Removed sticky positioning so the header scrolls normally */
+    #patient-date-action-div {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: gray;
+      font-size: 12px;  /* Slightly smaller font */
+      margin: 0 5%;
+      padding: 10px 0;
+      border-bottom: 1px solid #ddd;
+      background: white;
+    }
+    #patient-date-action-div p {
+      margin: 0;
+    }
+    /* Data rows for reports */
+    .data-newly-reports-div {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: black;
+      font-size: 14px;
+      margin: 0 5%;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    .data-newly-reports-div p:nth-child(3) {
+      display: flex;
+      align-items: center;
+    }
+    .data-newly-reports-div p:nth-child(3) i {
+      font-size: 18px;
+      color: gray;
+      cursor: pointer;
+    }
+    
+    /* ========= Bottom Main Container (Patient Requests) ========= */
+    /* Removed scroll bar by eliminating overflow and using a fixed height based on remaining space.
+       Calculation: header (80px) + fixed-divs (290px + 40px padding) = 80 + 330 = 410px.
+       Remaining bottom height = calc(100vh - 410px) */
+    #bottom-main-container {
+      height: calc(100vh - 410px);
+      overflow: hidden;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+      margin: 0 1.5%;
+    }
+    #bottom-main-container hr {
+      width: 100%;
+      margin-top: 1%;
+      margin-bottom: 1%;
+    }
+    /* Radio Button Div */
+    #radio-button-div {
+      display: flex;
+      gap: 20px;
+      background-color: #e0e0e0;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    .radio-option {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      color: #555;
+      width: 50%;
+    }
+    .radio-option input[type="radio"] {
+      display: none;
+    }
+    .radio-option span {
+      display: inline-block;
+      background-color: #f1f1f1;
+      padding: 5px 10px;
+      border-radius: 6px;
+    }
+    /* Patient Request Cards */
+    .div-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      width: 100%;
+      height: 200px;
+      overflow: auto;
+    }
+    .patient-aprrove-reject {
+      flex: 1 1 calc(33.33% - 10px);
+      box-sizing: border-box;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      padding: 2%;
+      margin-top: 2%;
+      line-height: 1.5;
+    }
+    .div-wrapper > .patient-aprrove-reject:only-child {
+      flex: 1 1 100%;
+    }
+    .button-div {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .button-div button {
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .button-div button:first-child {
+      background-color: white;
+      color: black;
+      border: 1px solid rgba(128, 128, 128, 0.2);
+    }
+    .button-div button:nth-child(2) {
+      background-color: black;
+      color: white;
+      border: none;
+    }
+    .button-div button:last-child {
+      background-color: red;
+      color: white;
+      border: none;
+    }
+    .patient-aprrove-reject p:first-of-type {
+      color: grey;
+    }
+    
+  
+    /* ========= Responsive Design ========= */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 50px;
+      }
+      .sidebar.collapsed {
+        width: 50px;
+      }
+      .main-content {
+        margin-left: 50px;
+        width: calc(100% - 50px);
+      }
+      .header-icons a {
+        font-size: 16px;
+      }
+      .appointment-container {
+        max-width: 100%;
+      }
+      .fixed-div {
+        height: auto;
+      }
+      .appointment-time-person {
+        max-width: 100%;
+      }
+      .div-wrapper {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .patient-aprrove-reject {
+        flex: 1 1 100%;
+        margin-top: 10px;
+      }
+      #radio-button-div {
+        flex-wrap: wrap;
+      }
+      .radio-option {
+        width: 100%;
+      }
+      .popup-form {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ===== Sidebar ===== -->
+  <div class="sidebar">
+    <div class="logo">Clinic Logo</div>
+    <nav id="nav-links">
+      <ul>
+        <li>
+          <a href="dashboard.html">
+            <i class="fa-solid fa-chart-line"></i>
+            <span> Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'clinic_list' %}">
+            <i class="fa-solid fa-user"></i>
+            <span>See Clinic List</span>
+          </a>
+        </li>
+
+      </ul>
+    </nav>    
+    <div id="collapse-icon" class="collapse-icon">
+      <i class="fa-solid fa-chevron-left"></i>
+    </div>
+  </div>
+
+  <!-- ===== Main Content ===== -->
+  <div class="main-content">
+    <!-- Header -->
+    <header>
+      <div class="header-left">
+        <h1>Admin Dashboard</h1>
+      </div>
+      <div class="header-icons">
+        <a href="#"><i class="fa-solid fa-cog"></i></a>
+        <a href="#"><i class="fa-solid fa-right-from-bracket"></i></a>
+      </div>
+    </header>
+
+
+    <div class="fixed-divs">
+      <div class="fixed-div" id="appointmentsDiv">
+        <div class="appointment-container">
+          <div class="left-section">
+            <h2>Add New Clinic</h2>
+            <p id="todayDate"></p>
+          </div>
+          <div class="right-section">
+            <a href="{% url 'add_clinic' %}" class="btn btn-primary">+ Add Clinic</a>
+        </div>
+        
+        </div>
+        <hr>
+        <!-- Scrollable content for appointments -->
+        <div id="appointmentsList">
+          <!-- Appointment rows will be dynamically loaded here -->
+        </div>
+      </div>
+
+
+    </div>
+
+  <script>
+    
+    /**************** Appointment Section Functionality ****************/
+    // Set today's date in human-readable format and in ISO for storage
+    const today = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('todayDate').textContent = today.toLocaleDateString("en-US", options);
+    const todayISO = today.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+
+    // Render appointments for today from localStorage
+    function renderAppointments() {
+      const appointmentsList = document.getElementById('appointmentsList');
+      appointmentsList.innerHTML = ''; // Clear existing content
+      let appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+      // Filter appointments for today only
+      appointments = appointments.filter(app => app.date === todayISO);
+      appointments.forEach(app => {
+        const appointmentRow = document.createElement('div');
+        appointmentRow.classList.add('appointment-time-person');
+        appointmentRow.innerHTML = `
+          <div class="left-section">
+            <p>${formatTime(app.time)}</p>
+            <p>${app.patientName}</p>
+          </div>
+          <div class="right-section">
+            <p>${app.doctorName}</p>
+          </div>
+        `;
+        appointmentsList.appendChild(appointmentRow);
+      });
+    }
+
+    // Helper function to format time from "HH:MM" (24-hour) to "HH:MM AM/PM"
+    function formatTime(timeStr) {
+      const [hourStr, minute] = timeStr.split(':');
+      let hour = parseInt(hourStr, 10);
+      const period = hour >= 12 ? 'PM' : 'AM';
+      if (hour > 12) hour -= 12;
+      if (hour === 0) hour = 12;
+      return `${String(hour).padStart(2, '0')}:${minute} ${period}`;
+    }
+
+    // Appointment Form Submission
+    const addAppointmentBtn = document.getElementById('addAppointmentBtn');
+    const overlay = document.getElementById('overlay');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const appointmentForm = document.getElementById('appointmentForm');
+
+    addAppointmentBtn.addEventListener('click', () => {
+      overlay.style.display = 'block';
+    });
+
+    cancelBtn.addEventListener('click', () => {
+      overlay.style.display = 'none';
+      appointmentForm.reset();
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.style.display = 'none';
+      }
+    });
+
+    appointmentForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const patientName = document.getElementById('patientName').value;
+      const doctorName = document.getElementById('doctorName').value;
+      const appointmentTime = document.getElementById('appointmentTime').value;
+      const appointmentType = document.getElementById('appointmentType').value;
+      if (!patientName || !doctorName || !appointmentTime || !appointmentType) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+      const newAppointment = {
+        patientName,
+        doctorName,
+        time: appointmentTime,
+        date: todayISO,
+        type: appointmentType,
+        status: "Scheduled"
+      };
+      let appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+      appointments.push(newAppointment);
+      localStorage.setItem('appointments', JSON.stringify(appointments));
+      renderAppointments();
+      overlay.style.display = 'none';
+      appointmentForm.reset();
+    });
+
+    // Initial load of appointments for today
+    renderAppointments();
+
+    /**************** Patient Request Section Functionality ****************/
+    // Filter patient request cards based on caretaker status ("with" or "without")
+    function filterPatientRequests(caretakerType) {
+      const cards = document.querySelectorAll('.patient-aprrove-reject');
+      cards.forEach(card => {
+        card.style.display = (card.getAttribute('data-caretaker') === caretakerType) ? 'block' : 'none';
+      });
+    }
+
+    // On page load, show patients without caretaker and highlight the radio option
+    filterPatientRequests("without");
+    document.querySelector('input[name="caregivers"][value="without"]').parentElement.style.backgroundColor = 'white';
+
+    // Radio button selection and filtering for patient requests
+    document.querySelectorAll('.radio-option').forEach(option => {
+      option.addEventListener('click', () => {
+        document.querySelectorAll('.radio-option').forEach(opt => {
+          opt.style.backgroundColor = '#e0e0e0';
+          opt.querySelector('input').checked = false;
+        });
+        option.style.backgroundColor = 'white';
+        option.querySelector('input').checked = true;
+        const selectedValue = option.querySelector('input').value;
+        filterPatientRequests(selectedValue);
+      });
+    });
+
+    /**************** Sidebar Collapse Functionality ****************/
+    const collapseIcon = document.getElementById("collapse-icon");
+    const sidebar = document.querySelector(".sidebar");
+
+    collapseIcon.addEventListener("click", () => {
+      sidebar.classList.toggle("collapsed");
+      const icon = collapseIcon.querySelector("i");
+      if (sidebar.classList.contains("collapsed")) {
+        icon.classList.remove("fa-chevron-left");
+        icon.classList.add("fa-chevron-right");
+        document.querySelectorAll('#nav-links li a span').forEach(link => {
+          link.style.display = "none";
+        });
+      } else {
+        icon.classList.remove("fa-chevron-right");
+        icon.classList.add("fa-chevron-left");
+        document.querySelectorAll('#nav-links li a span').forEach(link => {
+          link.style.display = "inline";
+        });
+      }
+    });
+  </script>
+</body>
+</html>
